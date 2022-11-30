@@ -631,16 +631,16 @@ void buttonpress(XEvent *e) {
 
 		x += blw;
 
-		for(i = 0; i < LENGTH(launchers); i++) {
-			x += TEXTW(launchers[i].name);
-
-			if (ev->x < x) {
-				Arg a;
-				a.v = launchers[i].command;
-				spawn(&a);
-				return;
-			}
-	}
+	// 	for(i = 0; i < LENGTH(launchers); i++) {
+	// 		x += TEXTW(launchers[i].name);
+	//
+	// 		if (ev->x < x) {
+	// 			Arg a;
+	// 			a.v = launchers[i].command;
+	// 			spawn(&a);
+	// 			return;
+	// 		}
+	// }
 
   if (ev->x > selmon->ww - (int)TEXTW(stext))
          click = ClkStatusText;
@@ -1494,12 +1494,12 @@ void drawbar(Monitor *m) {
   drw_setscheme(drw, scheme[SchemeLayout]);
   x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
 
-  	for (i = 0; i < LENGTH(launchers); i++)
-	{
-		w = TEXTW(launchers[i].name);
-		drw_text(drw, x, 0, w, bh, lrpad / 2, launchers[i].name, urg & 1 << i);
-		x += w;
-	}
+ //  	for (i = 0; i < LENGTH(launchers); i++)
+	// {
+	// 	w = TEXTW(launchers[i].name);
+	// 	drw_text(drw, x, 0, w, bh, lrpad / 2, launchers[i].name, urg & 1 << i);
+	// 	x += w;
+	// }
 
   if ((w = mw + m->gappov * 2 - sw - stw - x) > bh_n) {
     if (m->sel) {
