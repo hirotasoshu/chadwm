@@ -6,7 +6,7 @@
 interval=0
 
 # load colors
-. ~/.config/chadwm/scripts/bar_themes/onedark
+. ~/code/chadwm/scripts/bar_themes/catppuccin
 
 cpu() {
   cpu_val=$(grep -o "^[^ ]*" /proc/loadavg)
@@ -28,13 +28,31 @@ pkg_updates() {
 }
 
 battery() {
-  get_capacity="$(cat /sys/class/power_supply/BAT1/capacity)"
-  printf "^c$blue^   $get_capacity"
+  get_capacity="$(sb-battery)"
+  printf "^c$blue^ $get_capacity"
 }
 
-brightness() {
-  printf "^c$red^   "
-  printf "^c$red^%.0f\n" $(cat /sys/class/backlight/*/brightness)
+weather() {
+  get_weather="$(sb-weather -s -c "Yekaterinburg")"
+  printf "^c$green^ $get_weather"
+}
+
+volume() {
+  vol="$(pamixer --get-volume)"
+
+  if [ "$vol" -gt 70 ]; then
+	  icon=""
+  elif [ "$vol" -gt 50 ]; then
+	  icon="墳"
+  elif [ "$vol" -gt 30 ]; then
+	  icon=""
+  elif [ "$vol" -gt 0 ]; then
+	  icon=""
+  else
+        icon="婢"
+  fi
+  printf "^c$red^ $icon "
+  printf "^c$red^%.0f\n" $vol
 }
 
 mem() {
@@ -56,8 +74,8 @@ clock() {
 
 while true; do
 
-  [ $interval = 0 ] || [ $(($interval % 3600)) = 0 ] && updates=$(pkg_updates)
+  [ $interval = 0 ] || [ $(($interval % 3600)) = 0 ] && weather=$(weather)
   interval=$((interval + 1))
 
-  sleep 1 && xsetroot -name "$updates $(battery) $(brightness) $(cpu) $(mem) $(wlan) $(clock)"
+  sleep 1 && xsetroot -name "  $(cpu) $(mem) $(wlan) $(battery) $(volume) $weather $(clock)"
 done
