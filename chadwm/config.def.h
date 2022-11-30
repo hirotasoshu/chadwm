@@ -1,5 +1,10 @@
 /* See LICENSE file for copyright and license details. */
 
+/* Constants */
+#define TERMINAL "st"
+#define TERMCLASS "St"
+#define BROWSER "qutebrowser"
+
 #include <X11/XF86keysym.h>
 
 /* appearance */
@@ -31,11 +36,11 @@ static const int colorfultag        = 1;        /* 0 means use SchemeSel for sel
 #define ICONSIZE 19   /* icon size */
 #define ICONSPACING 8 /* space between icon and title */
 
-static const char *fonts[]          = {"Iosevka:style:medium:size=12" ,"JetBrainsMono Nerd Font:style:medium:size=11",
-                                        "Material Design Icons Desktop:size=11" };
+static const char *fonts[]          = {"Iosevka:style:medium:size=12", "Hack Nerd Font:pixelsize=13:antialias=true:autohint=true",
+                                        "Material Design Icons Desktop:size=11", "JoyPixels:pixelsize=14:antialias=true:autohint=true",  };
 
 // theme
-#include "themes/onedark.h"
+#include "themes/catppuccin.h"
 
 static const char *colors[][3]      = {
     /*                     fg       bg      border */
@@ -57,14 +62,14 @@ static const char *colors[][3]      = {
 };
 
 /* tagging */
-static char *tags[] = {"", "", "", "", ""};
+static char *tags[] = {"󱃖", "󰈹", "󰞷", "", "󱍢"};
 
-static const char* eww[] = { "eww", "open" , "eww", NULL };
+// static const char* eww[] = { "eww", "open" , "eww", NULL };
 
-static const Launcher launchers[] = {
-    /* command     name to display */
-    { eww,         "" },
-};
+// static const Launcher launchers[] = {
+//     /* command     name to display */
+//     { eww,         "" },
+// };
 
 static const int tagschemes[] = {
     SchemeTag1, SchemeTag2, SchemeTag3, SchemeTag4, SchemeTag5
@@ -132,24 +137,37 @@ static Key keys[] = {
     /* modifier                         key         function        argument */
 
     // brightness and audio 
-    {0,                     XF86XK_AudioMute,       spawn,          SHCMD("pamixer -t")},
-    {0,              XF86XK_AudioRaiseVolume,       spawn,          SHCMD("pamixer -i 5")},
-    {0,              XF86XK_AudioLowerVolume,       spawn,          SHCMD("pamixer -d 5")},
+	{ 0, XF86XK_AudioMute,		spawn,		SHCMD("pamixer -t") },
+	{ 0, XF86XK_AudioRaiseVolume,	spawn,		SHCMD("pamixer --allow-boost -i 3") },
+	{ 0, XF86XK_AudioLowerVolume,	spawn,		SHCMD("pamixer --allow-boost -d 3") },
+	{ 0, XF86XK_AudioPrev,		spawn,		{.v = (const char*[]){ "mpc", "prev", NULL } } },
+	{ 0, XF86XK_AudioNext,		spawn,		{.v = (const char*[]){ "mpc",  "next", NULL } } },
+	{ 0, XF86XK_AudioPause,		spawn,		{.v = (const char*[]){ "mpc", "pause", NULL } } },
+	{ 0, XF86XK_AudioPlay,		spawn,		{.v = (const char*[]){ "mpc", "play", NULL } } },
+	{ 0, XF86XK_AudioStop,		spawn,		{.v = (const char*[]){ "mpc", "stop", NULL } } },
+	{ 0, XF86XK_AudioRewind,	spawn,		{.v = (const char*[]){ "mpc", "seek", "-10", NULL } } },
+	{ 0, XF86XK_AudioForward,	spawn,		{.v = (const char*[]){ "mpc", "seek", "+10", NULL } } },
+	{ 0, XF86XK_AudioMedia,		spawn,		{.v = (const char*[]){ TERMINAL, "-e", "ncmpcpp", NULL } } },
+	{ 0, XF86XK_AudioMicMute,	spawn,		SHCMD("pactl set-source-mute @DEFAULT_SOURCE@ toggle") },
+	{ MODKEY,			XK_minus,	spawn,		SHCMD("pamixer --allow-boost -d 5") },
+	{ MODKEY|ShiftMask,		XK_minus,	spawn,		SHCMD("pamixer --allow-boost -d 15") },
+	{ MODKEY,			XK_equal,	spawn,		SHCMD("pamixer --allow-boost -i 5") },
+	{ MODKEY|ShiftMask,		XK_equal,	spawn,		SHCMD("pamixer --allow-boost -i 15") },
+	{ MODKEY,			XK_F4,		spawn,		SHCMD(TERMINAL " -e pulsemixer") },
     {0,              XF86XK_MonBrightnessDown,      spawn,          SHCMD("xbacklight -dec 5")},
     {0,              XF86XK_MonBrightnessUp,        spawn,          SHCMD("xbacklight -inc 5")},
 
     // screenshot fullscreen and cropped
-    {MODKEY|ControlMask,                XK_u,       spawn,
-        SHCMD("maim | xclip -selection clipboard -t image/png")},
-    {MODKEY,                            XK_u,       spawn,
-        SHCMD("maim --select | xclip -selection clipboard -t image/png")},
+  {MODKEY|ShiftMask,  XK_s, spawn,  SHCMD("xfce4-screenshooter -r -s ~/Pictures/Screenshots/$(date +%s%3N).png")},
+  {MODKEY|ControlMask,  XK_s, spawn,  SHCMD("xfce4-screenshooter -w -s ~/Pictures/Screenshots/$(date +%s%3N).png")},
+  {MODKEY,  XK_s, spawn,  SHCMD("xfce4-screenshooter -f -s ~/Pictures/Screenshots/$(date +%s%3N).png")},
 
-    { MODKEY,                           XK_c,       spawn,          SHCMD("rofi -show drun") },
-    { MODKEY,                           XK_Return,  spawn,            SHCMD("st")},
+    { MODKEY,                           XK_d,       spawn,            SHCMD("rofi -show drun") },
+    { MODKEY,                           XK_Return,  spawn,            SHCMD(TERMINAL)},
 
     // toggle stuff
     { MODKEY,                           XK_b,       togglebar,      {0} },
-    { MODKEY|ControlMask,               XK_t,       togglegaps,     {0} },
+    { MODKEY,                           XK_a,       togglegaps,     {0} },
     { MODKEY|ShiftMask,                 XK_space,   togglefloating, {0} },
     { MODKEY,                           XK_f,       togglefullscr,  {0} },
 
@@ -197,9 +215,14 @@ static Key keys[] = {
     { MODKEY|ControlMask|ShiftMask,     XK_d,       defaultgaps,    {0} },
 
     // layout
-    { MODKEY,                           XK_t,       setlayout,      {.v = &layouts[0]} },
-    { MODKEY|ShiftMask,                 XK_f,       setlayout,      {.v = &layouts[1]} },
-    { MODKEY,                           XK_m,       setlayout,      {.v = &layouts[2]} },
+	  { MODKEY,			                      XK_t,		    setlayout,	    {.v = &layouts[0]} }, /* tile */
+	  { MODKEY|ShiftMask,		              XK_t,		    setlayout,	    {.v = &layouts[1]} }, /* bstack */
+	  { MODKEY,			                      XK_y,		    setlayout,	    {.v = &layouts[2]} }, /* spiral */
+	  { MODKEY|ShiftMask,		              XK_y,		    setlayout,	    {.v = &layouts[3]} }, /* dwindle */
+	  { MODKEY,			                      XK_u,		    setlayout,	    {.v = &layouts[4]} }, /* deck */
+	  { MODKEY|ShiftMask,		              XK_u,		    setlayout,	    {.v = &layouts[5]} }, /* monocle */
+	  { MODKEY,			                      XK_i,		    setlayout,	    {.v = &layouts[6]} }, /* centeredmaster */
+	  { MODKEY|ShiftMask,		              XK_i,		    setlayout,	    {.v = &layouts[7]} }, /* centeredfloatingmaster */
     { MODKEY|ControlMask,               XK_g,       setlayout,      {.v = &layouts[10]} },
     { MODKEY|ControlMask|ShiftMask,     XK_t,       setlayout,      {.v = &layouts[13]} },
     { MODKEY,                           XK_space,   setlayout,      {0} },
@@ -211,6 +234,10 @@ static Key keys[] = {
     { MODKEY,                           XK_period,  focusmon,       {.i = +1 } },
     { MODKEY|ShiftMask,                 XK_comma,   tagmon,         {.i = -1 } },
     { MODKEY|ShiftMask,                 XK_period,  tagmon,         {.i = +1 } },
+	  { MODKEY,			                      XK_Left,	  focusmon,	      {.i = -1 } },
+	  { MODKEY|ShiftMask,		              XK_Left,	  tagmon,		      {.i = -1 } },
+	  { MODKEY,			                      XK_Right,	  focusmon,	      {.i = +1 } },
+	  { MODKEY|ShiftMask,		              XK_Right,	  tagmon,		      {.i = +1 } },
 
     // change border size
     { MODKEY|ShiftMask,                 XK_minus,   setborderpx,    {.i = -1 } },
@@ -226,19 +253,25 @@ static Key keys[] = {
     // restart
     { MODKEY|ShiftMask,                 XK_r,       restart,           {0} },
 
+    // apps
+	  { MODKEY,			XK_w,		spawn,		{.v = (const char*[]){ BROWSER, NULL } } },
+	  { MODKEY|ShiftMask,		XK_w,		spawn,		{.v = (const char*[]){ TERMINAL, "-e", "doas", "nmtui", NULL } } },
+	  { MODKEY,			XK_e,		spawn,		SHCMD(TERMINAL " -e neomutt ; rmdir ~/.abook") },
+	  { MODKEY|ShiftMask,		XK_e,		spawn,		SHCMD(TERMINAL " -e abook -C ~/.config/abook/abookrc --datafile ~/.config/abook/addressbook") },
+
     // hide & restore windows
-    { MODKEY,                           XK_e,       hidewin,        {0} },
-    { MODKEY|ShiftMask,                 XK_e,       restorewin,     {0} },
+    // { MODKEY,                           XK_e,       hidewin,        {0} },
+    // { MODKEY|ShiftMask,                 XK_e,       restorewin,     {0} },
 
     TAGKEYS(                            XK_1,                       0)
     TAGKEYS(                            XK_2,                       1)
     TAGKEYS(                            XK_3,                       2)
     TAGKEYS(                            XK_4,                       3)
     TAGKEYS(                            XK_5,                       4)
-    TAGKEYS(                            XK_6,                       5)
-    TAGKEYS(                            XK_7,                       6)
-    TAGKEYS(                            XK_8,                       7)
-    TAGKEYS(                            XK_9,                       8)
+    // TAGKEYS(                            XK_6,                       5)
+    // TAGKEYS(                            XK_7,                       6)
+    // TAGKEYS(                            XK_8,                       7)
+    // TAGKEYS(                            XK_9,                       8)
 };
 
 /* button definitions */
